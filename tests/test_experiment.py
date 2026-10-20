@@ -3,8 +3,19 @@ from pathlib import Path
 import subprocess
 import sys
 
+import numpy as np
+
+from phase_demo.experiment import align_for_evaluation
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_evaluation_restores_a_nonzero_global_turn_offset():
+    truth = np.array([[7.0, 7.2], [7.1, 7.3]])
+    unwrapped = truth - 4 * np.pi
+    aligned, turns = align_for_evaluation(unwrapped, truth)
+    assert turns == 2
+    np.testing.assert_allclose(aligned, truth, atol=1e-12)
 
 
 def test_cli_writes_figures_and_distinguishes_clean_noise_and_drift(tmp_path):

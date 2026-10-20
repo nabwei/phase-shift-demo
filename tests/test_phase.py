@@ -16,6 +16,19 @@ def test_zero_phase_produces_the_expected_four_intensities():
     np.testing.assert_allclose(images[:, 0, 0], [0.9, 0.5, 0.1, 0.5])
 
 
+def test_drift_accumulates_instead_of_shifting_every_frame_equally():
+    images = generate_fringes([[0]], n_steps=5, phase_drift=0.1)
+    assert images[0, 0, 0] == pytest.approx(0.9)
+    assert images[1, 0, 0] == pytest.approx(0.5 + 0.4 * np.cos(2 * np.pi / 5 + 0.1))
+    assert images[3, 0, 0] == pytest.approx(0.5 + 0.4 * np.cos(6 * np.pi / 5 + 0.3))
+
+
+def test_numpy_integer_step_count_matches_builtin_integer():
+    np.testing.assert_array_equal(
+        generate_fringes([[0.2]], np.int64(5)), generate_fringes([[0.2]], 5)
+    )
+
+
 @pytest.mark.parametrize("n_steps", [3, 5, 8])
 def test_smooth_ramp_is_recovered_across_both_axes_up_to_one_turn(n_steps):
     y, x = np.mgrid[0:24, 0:32]
@@ -44,7 +57,8 @@ def test_a_pixel_without_modulation_rejects_the_stack():
 
 @pytest.mark.parametrize(
     "settings",
-    [{"n_steps": 2}, {"noise_std": -0.1}, {"phase_drift": np.inf}],
+    [{"n_steps": 2}, {"n_steps": np.int64(2)}, {"n_steps": 3.0},
+     {"noise_std": -0.1}, {"phase_drift": np.inf}],
 )
 def test_invalid_synthesis_settings_are_rejected(settings):
     with pytest.raises(ValueError):
