@@ -1,9 +1,13 @@
 # Phase-Shifting mit synthetischen Streifenbildern
 
+[![Tests](https://github.com/nabwei/phase-shift-demo/actions/workflows/tests.yml/badge.svg)](https://github.com/nabwei/phase-shift-demo/actions/workflows/tests.yml)
+
 Ein vollständiges kleines Experiment in Python: Streifenbilder erzeugen,
 die Phase aus mehreren Bildern berechnen, einfach entpacken und den Fehler
 gegen eine bekannte synthetische Referenz auswerten. Alle Bilder und Daten
 werden mathematisch erzeugt.
+
+Mit KI-Unterstützung entwickelt, einschließlich Implementierung, Tests und Dokumentation.
 
 ![Synthetisches Beispiel mit Rauschen](docs/noise.png)
 
@@ -90,18 +94,24 @@ von `2*pi` anhand der Referenz korrigiert. Sonstige Phasenfehler bleiben erhalte
 Die Referenz fließt nicht in die Phasenschätzung oder das Entpacken ein.
 Die Werte beschreiben diese synthetischen Fälle, keine Genauigkeit realer Geräte.
 
-Lokal unter Windows mit Python 3.12.10: **15 pytest-Fälle bestanden**.
+Die ursprüngliche Suite enthielt 15 pytest-Fälle. Die überarbeitete Suite prüft
+zusätzlich akkumulierte Drift, NumPy-Integer-Schrittzahlen, ungültige Schrittwerte
+und die Referenzausrichtung um zwei volle Umdrehungen.
+Die aktuelle Suite umfasst 20 pytest-Fälle; sie bestand lokal unter Windows
+mit Python 3.12.14, NumPy 2.2.6 und Matplotlib 3.11.2. CI installiert die
+im Repository fixierten Paketversionen und prüft zusätzlich Ubuntu.
 Die Tests prüfen handberechnete Quadranten, drei unterschiedliche Schrittzahlen,
 Entpacken über beide Achsen, ungültige Daten, fehlende Modulation und den
 CLI-Lauf inklusive JSON und PNG. Der [GitHub-Actions-Workflow](.github/workflows/tests.yml)
-führt diese Suite unter Windows und Linux aus. Der lokale Testnachweis oben
-bezieht sich auf Windows.
+führt diese Suite unter Windows und Linux aus.
 
-## Dateien und Grenzen
+## Dateien
 
 - [`phase_demo/core.py`](phase_demo/core.py): Erzeugung, Phasenschätzung, Entpacken.
 - [`phase_demo/experiment.py`](phase_demo/experiment.py): Fälle, Auswertung, Grafiken, CLI.
 - [`tests/`](tests/): numerische Prüfungen und vollständiger Programmlauf.
+
+## Limitations
 
 Das einfache Entpacken setzt eine glatte Phase mit Nachbardifferenzen kleiner
 als `pi` voraus. Sprünge, Masken, Schatten und starke Störungen können falsche
@@ -124,6 +134,8 @@ Only a global integer-turn ambiguity is removed for evaluation.
 This demonstrates phase processing and testing; it does not reconstruct
 3D geometry or validate real hardware. The commands above run the experiment
 and tests with Python 3.12.
+Developed with AI assistance. Additional regressions cover accumulated drift,
+NumPy integer step counts and nonzero whole-turn alignment for evaluation.
 
 ## Lizenz
 
