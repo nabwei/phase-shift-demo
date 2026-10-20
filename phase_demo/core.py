@@ -1,3 +1,5 @@
+import operator
+
 import numpy as np
 
 
@@ -17,7 +19,11 @@ def generate_fringes(phase, n_steps=5, *, noise_std=0.0, phase_drift=0.0, seed=0
     Values are not clipped or quantised. Drift accumulates from frame zero.
     """
     phase = _finite_array(phase, 2, "phase")
-    if isinstance(n_steps, bool) or not isinstance(n_steps, int) or n_steps < 3:
+    try:
+        n_steps = operator.index(n_steps)
+    except TypeError as error:
+        raise ValueError("n_steps must be an integer of at least 3") from error
+    if n_steps < 3:
         raise ValueError("n_steps must be an integer of at least 3")
     if not np.isfinite(noise_std) or noise_std < 0:
         raise ValueError("noise_std must be finite and nonnegative")

@@ -11,6 +11,11 @@ from matplotlib import pyplot as plt
 from .core import generate_fringes, recover_phase, unwrap_phase
 
 
+def align_for_evaluation(unwrapped, truth):
+    turns = int(np.rint(np.mean((truth - unwrapped) / (2 * np.pi))))
+    return unwrapped + turns * 2 * np.pi, turns
+
+
 def _save_figure(path, name, first_frame, wrapped, aligned, error, rmse):
     figure, axes = plt.subplots(2, 2, figsize=(10, 7), layout="constrained")
     error_limit = max(float(np.max(np.abs(error))), 1e-8)
@@ -49,8 +54,7 @@ def run_experiment(output, n_steps=5, seed=0):
         wrapped, modulation = recover_phase(images)
         unwrapped = unwrap_phase(wrapped)
         # Truth is used only for evaluation: remove a global integer-turn ambiguity.
-        turns = int(np.rint(np.mean((truth - unwrapped) / (2 * np.pi))))
-        aligned = unwrapped + turns * 2 * np.pi
+        aligned, turns = align_for_evaluation(unwrapped, truth)
         error = aligned - truth
         circular_error = np.arctan2(np.sin(wrapped - truth), np.cos(wrapped - truth))
         rmse = float(np.sqrt(np.mean(error**2)))
